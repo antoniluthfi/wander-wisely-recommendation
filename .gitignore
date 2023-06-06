@@ -1,0 +1,12 @@
+virtualenv/
+
+*.pyc
+*.pyo
+__pycache__/
+
+logs/
+lib/
+.vscode/
+.idea/
+build/
+dist/
