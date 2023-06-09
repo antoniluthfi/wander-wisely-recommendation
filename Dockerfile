@@ -5,11 +5,11 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y libpq-dev gcc libmysqlclient-dev
 
-RUN pip install --upgrade pip virtualenv
+RUN pip install --upgrade pip
 
 COPY requirements.txt requirements.txt
 
-RUN virtualenv venv
+RUN python -m venv venv
 RUN /bin/bash -c "source venv/bin/activate && pip install --no-cache-dir -r requirements.txt"
 
 COPY . .
