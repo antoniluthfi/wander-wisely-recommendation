@@ -2,7 +2,8 @@ FROM python:3.8-slim-buster
 
 WORKDIR /app
 
-RUN apt-get update && \
+RUN sed -i 's/http:\/\/deb.debian.org/http:\/\/archive.ubuntu.com\/ubuntu/g' /etc/apt/sources.list && \
+    apt-get update && \
     apt-get install -y libpq-dev gcc && \
     apt-get install -y libmysqlclient-dev
 
