@@ -3,8 +3,8 @@ FROM python:3.8-slim-buster
 WORKDIR /app
 
 RUN apt-get update && \
-  apt-get install -y libpq-dev gcc
-  apt-get install libmysqlclient-dev
+    apt-get install -y libpq-dev gcc && \
+    apt-get install -y libmysqlclient-dev
 
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
