@@ -50,7 +50,7 @@ def sort(x):
     return x
 
 
-@app.route('/recommendation', methods=['GET'])
+@app.route('/recommendation', methods=['POST'])
 def get_recommendation():
     print(request.args.get('hobbies'))
     if request.headers['Content-Type'] == 'application/json':
@@ -126,7 +126,7 @@ def get_recommendation():
 
                 combined_similarity_scores = (
                     0.5 * types_similarity_scores) + (0.5 * descriptions_similarity_scores)
-                rankings = combined_similarity_scores.argsort()[0][::-1][:5]
+                rankings = combined_similarity_scores.argsort()[0][::-1]
                 attractions_df = attractions_df.loc[rankings]
             else:
                 return jsonify({
@@ -151,7 +151,8 @@ def get_recommendation():
 
             return jsonify({
                 "success": True,
-                "data": attractions_df.to_dict(orient='records'),
+                "data": attractions_df.head().to_dict(orient='records'),
+                "total": len(attractions_df.head())
             })
         except Exception as e:
             print(e)
