@@ -16,19 +16,32 @@ def index():
 
     cur = mysql.connection.cursor()
     cur.execute(
-        """SELECT * FROM tourism_attractions 
-        LEFT JOIN tourism_types 
-        ON tourism_attractions.tourism_type_id = tourism_types.id
+        """SELECT 
+            tourism_attractions.*, 
+            tourism_types.name AS tourism_type_name, 
+            tourism_files.tourism_attraction_id, 
+            GROUP_CONCAT(tourism_files.filename) AS filename, 
+            GROUP_CONCAT(tourism_files.path) AS path
+        FROM tourism_attractions 
+        LEFT JOIN tourism_types ON tourism_attractions.tourism_type_id = tourism_types.id 
+        LEFT JOIN tourism_files ON tourism_attractions.id = tourism_files.tourism_attraction_id
+        GROUP BY tourism_attractions.id
         LIMIT %s OFFSET %s
         """, (per_page, offset))
-    results = cur.fetchall()
+    tourism_attractions = cur.fetchall()
 
     cur.execute("SELECT COUNT(*) AS count FROM tourism_attractions")
     total_items = cur.fetchall()[0]['count']
 
+    attractions_df = pd.DataFrame(tourism_attractions)
+    attractions_df['filename'] = attractions_df['filename'].str.split(
+        ',').tolist()
+    attractions_df['path'] = attractions_df['path'].str.split(
+        ',').tolist()
+
     return jsonify({
         "success": True,
-        "data": results,
+        "data": attractions_df.to_dict(orient='records'),
         'total': total_items
     })
 
@@ -37,12 +50,12 @@ def sort(x):
     return x
 
 
-@app.route('/recommendation', methods=['POST'])
+@app.route('/recommendation', methods=['GET'])
 def get_recommendation():
+    print(request.args.get('hobbies'))
     if request.headers['Content-Type'] == 'application/json':
         try:
             body = request.get_json()
-
             cur = mysql.connection.cursor()
 
             # Get tourism_attractions data
